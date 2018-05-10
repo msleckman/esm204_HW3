@@ -1,0 +1,48 @@
+---
+title: "204Hw3"
+author: "Casey Moorhead"
+date: "5/9/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r data}
+
+HW3Data <- read_csv("~/Desktop/ESM 204 - Econ/HW3Data.csv")
+
+glm<-glm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
+glm
+summary(glm)
+
+logit2prob <- function(logit){
+  odds <- exp(logit)
+  prob <- odds / (1 + odds)
+  return(prob)
+}
+
+prob.glm<-logit2prob(coef(glm))
+prob.glm
+
+summary(prob.glm)
+
+library(tidyverse)
+plot(prob.glm)
+
+```
+
+```{r pick3}
+#value of a single prevented whale death
+.5010422*0.04 # = 0.02004169
+
+respondent1<-sample_n(HW3Data,1)
+#bid = 80. WTP?
+#-2.09 - 0.13+ 0.04 + 0.08*25 - 0.005*80 +0.004*20 = -0.5
+respondent2<-sample_n(HW3Data,1)
+respondent3<-sample_n(HW3Data,1)
+#plug in probability of yes based on calculation, and then calculate the WTP? Change risk to 60.
+
+```
+
