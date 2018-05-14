@@ -11,24 +11,41 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r data}
 
-HW3Data <- read_csv("~/Desktop/ESM 204 - Econ/HW3Data.csv")
+library(tidyverse)
 
+# HW3Data <- read_csv("~/Desktop/ESM 204 - Econ/HW3Data.csv")
+setwd("C:/github/esm204_HW3")
+HW3Data <- read_csv("HW3Data.csv")
+
+## Change character columns to factors columns and relevel
+HW3Data$income<-factor(HW3Data$income, levels=c("poor","middle","rich","very_rich","one_percent")) 
+HW3Data$age<-factor(HW3Data$age,levels=c("tothirty","toforty","tofifty","tosixty","oversixty")) 
+levels(HW3Data$age)  
+class(HW3Data$age)
+
+## Model using glm which is what is generally used for probability/binomial
 glm<-glm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
 glm
 summary(glm)
+```
 
-logit2prob <- function(logit){
-  odds <- exp(logit)
-  prob <- odds / (1 + odds)
-  return(prob)
-}
+```{r lm}
 
-prob.glm<-logit2prob(coef(glm))
-prob.glm
+# Model using linear model b
+datalm<-lm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
+summary(datalm)
 
-summary(prob.glm)
-
-library(tidyverse)
+# logit2prob <- function(logit){
+#   odds <- exp(logit)
+#   prob <- odds / (1 + odds)
+#   return(prob)
+# }
+# 
+# prob.glm<-logit2prob(coef(glm))
+# prob.glm
+# 
+# summary(prob.glm)
+```
 plot(prob.glm)
 
 ```
