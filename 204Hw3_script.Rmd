@@ -1,7 +1,7 @@
 ---
 title: "204Hw3"
 author: "Casey Moorhead"
-date: "5/9/2018"
+date: "5/15/2018"
 output: html_document
 ---
 
@@ -23,43 +23,43 @@ HW3Data$age<-factor(HW3Data$age,levels=c("tothirty","toforty","tofifty","tosixty
 levels(HW3Data$age)  
 class(HW3Data$age)
 
-## Model using glm which is what is generally used for probability/binomial
-glm<-glm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
-glm
-summary(glm)
+# Model using glm which is what is generally used for probability/binomial
+# glm<-glm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
+# glm
+# summary(glm)
 ```
 
 ```{r lm}
-
 # Model using linear model b
 datalm<-lm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
 summary(datalm)
+# we must assume that anything above 0.5 is a yes vote
+ 
+plot(datalm)
 
-# logit2prob <- function(logit){
-#   odds <- exp(logit)
-#   prob <- odds / (1 + odds)
-#   return(prob)
-# }
-# 
-# prob.glm<-logit2prob(coef(glm))
-# prob.glm
-# 
-# summary(prob.glm)
+ggplot(data = datalm, aes(x=vote, y=bid))+
+  geom_line()
+
 ```
-plot(prob.glm)
+
+2. 
+```{r WTP_60%}
+
+# reshuffle the equation to isolate bid (or price).
+# Set risk at 60% 
+# determine the willingness to pay. 
+# calculate the vertical distance between the vertical distance between the original lm and the new
+# lm with a risk value of 60%.
 
 ```
 
 ```{r pick3}
 #value of a single prevented whale death
-.5010422*0.04 # = 0.02004169
 
 respondent1<-sample_n(HW3Data,1)
-#bid = 80. WTP?
-#-2.09 - 0.13+ 0.04 + 0.08*25 - 0.005*80 +0.004*20 = -0.5
 respondent2<-sample_n(HW3Data,1)
 respondent3<-sample_n(HW3Data,1)
-#plug in probability of yes based on calculation, and then calculate the WTP? Change risk to 60.
 
+#plug in probability of yes based on calculation, and then calculate the WTP? Change risk to 60.
 ```
 
