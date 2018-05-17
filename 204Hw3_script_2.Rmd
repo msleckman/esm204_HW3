@@ -1,0 +1,176 @@
+---
+title: "204Hw3"
+author: "Casey Moorhead & Margaux Sleckman"
+date: "5/15/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r data}
+
+library(tidyverse)
+
+## HW3Data <- read_csv("~/Desktop/ESM 204 - Econ/HW3Data.csv")
+setwd("C:/github/esm204_HW3")
+HW3Data <- read_csv("HW3Data.csv")
+HW3Data <- read_csv("~/Desktop/ESM 204 - Econ/HW3Data.csv")
+
+## Change character columns to factors columns and relevel
+HW3Data$income<-factor(HW3Data$income, levels=c("poor","middle","rich","very_rich","one_percent")) 
+HW3Data$age<-factor(HW3Data$age,levels=c("tothirty","toforty","tofifty","tosixty","oversixty"))
+levels(HW3Data$age)  
+class(HW3Data$age)
+
+# Model using glm which is what is generally used for probability/binomial
+# glm<-glm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
+# glm
+# summary(glm)
+```
+
+```{r lm}
+# Model using linear model b
+datalm<-lm(vote~age+income+NEP+bid+risk, data=HW3Data, family="binomial")
+summary(datalm)
+# we must assume that anything above 0.5 is a yes vote
+
+plot(datalm)
+
+ggplot(data = datalm, aes(x=vote, y=bid))+
+  geom_line()
+
+```
+
+2. 
+```{r WTP_60%}
+
+# reshuffle the equation to isolate bid (or price)
+
+#y = (a0+a1Price+a2Income+a3Age+a4NEP+a5bid+a6risk)
+#P = (y - a0-a2Income-a3Age-a4NEP+a5bid+a6risk)/a5
+
+HW3Data1<-HW3Data %>% 
+  mutate(income_onepercent = ifelse(income == "one_percent",1,0)) %>%
+  mutate(incomevery_rich = ifelse(income == "very_rich",1,0)) %>% 
+  mutate(income_rich = ifelse(income == "rich",1,0)) %>% 
+  mutate(incomemiddle = ifelse(income == "middle",1,0)) %>% 
+  mutate(incomepoor = ifelse(income == "poor",1,0)) %>%
+  mutate(agetothirty = ifelse(age == "tothirty",1,0)) %>% 
+  mutate(agetoforty = ifelse(age == "toforty",1,0)) %>% 
+  mutate(agetofifty = ifelse(age == "tofifty",1,0)) %>% 
+  mutate(agetosixty = ifelse(age == "tosixty",1,0)) %>%
+  mutate(ageoversixty = ifelse(age == "oversixty",1,0))
+
+View(HW3Data1)
+
+HW3Data2<-HW3Data1 %>%
+  mutate(bid2=((vote-0.1428764)-(0.0007445*risk)-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)- (agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699)) 
+
+HW3Data2<-HW3Data2 %>%
+  mutate(bid_4percent=((vote-0.1428764)-(0.0007445*(risk+4))-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)- (agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699)) %>% 
+  mutate(difference=(bid_4percent-bid2))
+
+View(HW3Data2)
+
+#bid you get at .5, any bid at this amount or less will be yes
+
+# Set risk at 60%
+
+P = (y - a0-a2Income-a3Age-a4NEP+a5bid+a6(0.6))/a5
+
+# determine the willingness to pay.
+
+# calculate the vertical distance between the vertical distance between the original lm and the new lm with a risk value of 60%.
+
+```
+
+```{r pick3}
+#value of a single prevented whale death
+
+respondent1<-sample_n(HW3Data1,1)
+respondent2<-sample_n(HW3Data1,1)
+respondent3<-sample_n(HW3Data1,1)
+
+df.random.resp<-data.frame(sample_n(HW3Data1,3))
+
+df.random.resp<-df.random.resp %>%
+  mutate(risk60=60)
+  
+df.random.resp<-df.random.resp %>%
+  mutate(bid_60=((vote-0.1428764)-(0.0007445*(risk60))-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)-(agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699))
+
+View(df.random.resp)
+
+#plug in probability of yes based on calculation, and then calculate the WTP? Change risk to 60.
+
+#P = (y - a0-a2Income-a3Age-a4NEP+a5bid+a6risk)/a5
+
+```
+
+```{r number4}
+
+df.random.resp<-df.random.resp %>%
+  mutate(risk60=60)
+
+HW3Data3<-HW3Data1 %>%
+  mutate(risk60=60) %>%
+  mutate(bid_60=((vote-0.1428764)-(0.0007445*(risk60))-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)-(agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699))
+
+View(HW3Data3)
+
+mean(HW3Data3$bid_60)
+#66.73501
+
+```
+
+```{r trial_error4}
+
+df.random.resp<-df.random.resp %>%
+  mutate(risk60=60)
+
+HW3Data3<-HW3Data1 %>%
+  mutate(risk60=60) %>%
+  mutate(bid_60=((0.5-0.1428764)-(0.0007445*(risk60))-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)-(agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699))
+
+View(HW3Data3)
+
+mean(HW3Data3$bid_60)
+#266.75
+
+```
+
+```{r number5}
+
+0.1428764/-0.0010699
+
+HW3Data4<-HW3Data1 %>%
+  mutate(bid.vote0=((0-0.1428764)-(0.0007445*risk)-(incomemiddle*-0.0027386)-(income_rich*0.0047505)-(incomevery_rich*0.0440535)-(income_onepercent*0.0060895)-(NEP*0.0158639)-(agetoforty*-0.0405591)- (agetofifty*-0.0104585)-(agetosixty*-0.0366662)-(ageoversixty*-0.0204401))/(-0.0010699)) 
+
+View(HW3Data4)
+mean(HW3Data4$bid.vote0)
+#726.43
+
+(726.43-266.75)*150000
+#68952000 total benefits?
+#734 (bid where 0% will say yes - demand = 0, choke price)- 267 (WTP)*150,000 (households)
+#where the probability = 0. Instead of 0.5 as vote, use 0.
+
+726.43*.5*1*150000
+#54,482,250 total benefits (triangle)
+
+#7 million/150,000 (cost per person)
+
+```
+
+```{r number6}
+
+54482250-7000000
+#47,482,250 net benefits. 
+# Benefits outweigh the costs.
+
+#total benefits-7 mill cost
+
+```
+
